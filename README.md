@@ -7,6 +7,7 @@ Bootstrap helper for getting [Claude Code](https://claude.ai/code) configured an
 | File | Description |
 |------|-------------|
 | `claude/` | Mirror of `~/.claude/` — files here are copied to `~/.claude/` by `setup.sh` |
+| `claude/CLAUDE.md` | Global instructions for Claude (e.g. git workflow rules) |
 | `claude/settings.json` | Opinionated user-level Claude Code settings |
 | `claude/statusline-command.sh` | Status line script showing cwd, git branch, model, context %, and rate limit usage |
 | `claude-settings-reference.md` | Full reference for all `settings.json` options |

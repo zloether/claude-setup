@@ -9,6 +9,7 @@ This repo is a bootstrap helper for configuring a personal Claude Code instance.
 | File | Purpose |
 |------|---------|
 | `claude/` | Mirror of `~/.claude/` — everything here is copied to `~/.claude/` by `setup.sh` |
+| `claude/CLAUDE.md` | Global instructions for Claude (e.g. git workflow rules) |
 | `claude/settings.json` | Opinionated user-level Claude Code settings |
 | `claude/statusline-command.sh` | Status line script: cwd, git branch, model, context %, rate limit usage |
 | `claude-settings-reference.md` | Comprehensive reference for every `settings.json` key with examples |

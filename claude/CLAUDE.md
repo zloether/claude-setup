@@ -1,0 +1,1 @@
+- Never use `git -C <path>` to specify a working directory. Git already operates on the current working tree; use plain `git` commands directly.

@@ -30,7 +30,10 @@
             "Bash(npx *)",
             "Bash(python *)",
             "Bash(python3 *)",
-            "Bash(npm run *)"
+            "Bash(npm run *)",
+            "Read(**/Desktop/**)",
+            "Read(**/Documents/**)",
+            "Read(**/Downloads/**)"
         ],
         "deny": [
             "Read",
@@ -47,7 +50,11 @@
             "Read(**/id_ed25519*)",
             "Read(**/.aws/**)",
             "Read(**/.config/gcloud/**)",
+            "Read(**/.gnupg/**)",
             "Read(**/node_modules/**)",
+            "Write(**/.git/hooks/**)",
+            "Write(**/.git/config)",
+            "Write(**/.mcp.json)",
             "Bash(sudo *)",
             "Bash(su *)",
             "Bash(curl *)",

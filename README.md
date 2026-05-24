@@ -59,7 +59,7 @@ Follow the prompts to authenticate with your Claude.ai account (Pro/Max) or an A
 
 The included `settings.json` is set up with these principles:
 
-- **Safe defaults**: `Read`, `Edit`, and `Write` require approval by default, with specific `allow` rules for common safe operations.
+- **`Read`/`Edit`/`Write` denied at user level**: these tools are in the user-level `deny` list, so Claude cannot read or modify files in any project unless a project-level `settings.json` explicitly re-allows them (see below).
 - **Sensitive file protection**: `.env`, credentials, SSH keys, cloud credentials, and `node_modules` are blocked from reads.
 - **Dangerous command blocking**: `sudo`, `rm -rf`, `curl`, `wget`, network exfiltration tools, and service managers are denied outright.
 - **Approval prompts for higher-risk actions**: `git push`, `npm install`, `pip install`, web fetch/search, and `chmod` ask for approval.
@@ -78,3 +78,39 @@ If you update files in `claude/`, re-apply with:
 ```bash
 ./setup.sh
 ```
+
+---
+
+## Project-level `settings.json`
+
+Because `Read`, `Edit`, and `Write` are denied in the user-level `settings.json`, every project you work in needs its own `.claude/settings.json` to re-enable them. Without it, Claude will be blocked from reading or writing any files.
+
+Create `.claude/settings.json` at the root of each project:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write"
+    ]
+  }
+}
+```
+
+You can scope these more tightly if needed — for example, restricting writes to a specific directory:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write(src/**)"
+    ]
+  }
+}
+```
+
+User-level `deny` rules always take precedence over project-level `allow` rules for the sensitive files listed in `settings.json` (`.env`, SSH keys, credentials, etc.), so those remain protected even when a project grants broad file access.

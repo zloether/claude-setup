@@ -12,6 +12,9 @@ Bootstrap helper for getting [Claude Code](https://claude.ai/code) configured an
 | `claude/statusline-command.sh` | Status line script showing cwd, git branch, model, context %, and rate limit usage |
 | `claude-settings-reference.md` | Full reference for all `settings.json` options |
 | `setup.sh` | Copies `claude/` to `~/.claude/`; validates install |
+| `.claude/settings.json` | Project-level settings for this repo (enables Read/Edit/Write here) |
+| `CLAUDE.md` | Minimal project instructions pointing to AGENTS.md |
+| `AGENTS.md` | AI agent instructions for assisted setup |
 
 ---
 
@@ -63,6 +66,7 @@ The included `settings.json` is set up with these principles:
 - **Sensitive file protection**: `.env`, credentials, SSH keys, cloud credentials, and `node_modules` are blocked from reads.
 - **Dangerous command blocking**: `sudo`, `rm -rf`, `curl`, `wget`, network exfiltration tools, and service managers are denied outright.
 - **Approval prompts for higher-risk actions**: `git push`, `npm install`, `pip install`, web fetch/search, and `chmod` ask for approval.
+- **Python scripts auto-allowed, broader invocations ask**: `python *.py` and `python3 *.py` are auto-allowed; patterns like `python script --flags` fall through to `ask`.
 - **No co-author attribution**: Claude's name is not added to git commits.
 - **Stable update channel**: updates lag ~1 week behind latest to avoid known-bad releases.
 - **`bypassPermissions` mode disabled**: prevents accidentally running with no permission checks.
@@ -91,9 +95,9 @@ Create `.claude/settings.json` at the root of each project:
 {
   "permissions": {
     "allow": [
-      "Read",
-      "Edit",
-      "Write"
+      "Read(./**)",
+      "Edit(./**)",
+      "Write(./**)"
     ]
   }
 }
@@ -113,4 +117,28 @@ You can scope these more tightly if needed — for example, restricting writes t
 }
 ```
 
-User-level `deny` rules always take precedence over project-level `allow` rules for the sensitive files listed in `settings.json` (`.env`, SSH keys, credentials, etc.), so those remain protected even when a project grants broad file access.
+Scoped project-level `allow` rules (e.g. `Read(./**)`) override the generic user-level `deny` for `Read`, because they are more specific. However, the explicitly-patterned deny rules for sensitive files (`.env`, SSH keys, credentials, etc.) remain in force — no project-level allow can override those unless it exactly matches one of those specific patterns.
+
+---
+
+## Threat model and limitations
+
+The `Bash` deny rules in `settings.json` are a **best-effort guardrail**, not a security boundary. Claude Code cannot enforce them against shell-level evasion (e.g. `bash -c "..."`, `python -c "..."`, indirect reads via `cat`). The shipped settings add deny rules for the most common evasion patterns, and the `sandbox` section adds OS-level enforcement for sensitive credential paths — but you should assume that a sufficiently motivated prompt injection in any file Claude reads could attempt to bypass these rules.
+
+Key assumptions:
+- **Prompt injection is real**: any file Claude reads in your project (README, config, comments) can attempt to redirect Claude's behavior. Review what you allow Claude to read in untrusted repos.
+- **`Bash` deny ≠ shell deny**: deny rules match the command string Claude proposes; they do not intercept child processes or shell builtins.
+- **Sandbox is the actual barrier**: `sandbox.enabled: true` enforces the `filesystem.denyRead` list at the OS level, bypassing Bash deny entirely for those paths.
+- **Project `.claude/settings.json` is trusted on load**: any repo you clone and run Claude in can add `allow` rules and define hooks. Review project settings before accepting them.
+
+### Warning: untrusted repos
+
+**Do not run Claude Code inside a repo you don't trust.** A malicious `.claude/settings.json` in a cloned repo can:
+
+- Define `hooks` (`PreToolUse`, `PostToolUse`, etc.) that run shell commands automatically — without a permission prompt — every time Claude uses a tool. These run at the OS level and are not blocked by your `Bash` deny rules.
+- Add `allow` rules that re-enable tools your user settings deny.
+- Override scalar settings (e.g. re-enable `bypassPermissions` mode).
+
+Hooks are the sharpest edge: they execute silently, merge across settings scopes, and the only reliable way to disable them machine-wide is via a system-level `managed-settings.json` (requires admin). User-level `disableAllHooks: true` can itself be overridden by a higher-priority project setting.
+
+**Before opening Claude in an unfamiliar repo**, check whether `.claude/settings.json` exists and review its contents — especially any `hooks` key.

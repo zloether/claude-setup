@@ -30,10 +30,7 @@
             "Bash(npx *)",
             "Bash(python *)",
             "Bash(python3 *)",
-            "Bash(npm run *)",
-            "Read(**/Desktop/**)",
-            "Read(**/Documents/**)",
-            "Read(**/Downloads/**)"
+            "Bash(npm run *)"
         ],
         "deny": [
             "Read",
@@ -52,6 +49,9 @@
             "Read(**/.config/gcloud/**)",
             "Read(**/.gnupg/**)",
             "Read(**/node_modules/**)",
+            "Read(**/Desktop/**)",
+            "Read(**/Documents/**)",
+            "Read(**/Downloads/**)",
             "Write(**/.git/hooks/**)",
             "Write(**/.git/config)",
             "Write(**/.mcp.json)",
@@ -65,15 +65,55 @@
             "Bash(nc *)",
             "Bash(ncat *)",
             "Bash(rm -rf *)",
+            "Bash(rm -fr *)",
+            "Bash(rm -r *)",
+            "Bash(rm --recursive *)",
             "Bash(mkfs *)",
             "Bash(dd *)",
             "Bash(chown *)",
             "Bash(crontab *)",
             "Bash(at *)",
             "Bash(launchctl *)",
-            "Bash(systemctl *)"
+            "Bash(systemctl *)",
+            "Bash(bash -c *)",
+            "Bash(sh -c *)",
+            "Bash(zsh -c *)",
+            "Bash(fish -c *)",
+            "Bash(eval *)",
+            "Bash(env *)",
+            "Bash(xargs *)",
+            "Bash(python -c *)",
+            "Bash(python3 -c *)",
+            "Bash(node -e *)",
+            "Bash(perl -e *)",
+            "Bash(ruby -e *)",
+            "Bash(cat **/.env*)",
+            "Bash(cat **/.ssh/**)",
+            "Bash(cat **/.aws/**)",
+            "Bash(cat **/id_rsa*)",
+            "Bash(cat **/id_ed25519*)",
+            "Bash(cat **/.gnupg/**)",
+            "Bash(grep * **/.env*)",
+            "Bash(grep * **/.ssh/**)",
+            "Bash(grep * **/.aws/**)",
+            "Bash(find * **/.ssh/**)",
+            "Bash(find * **/.aws/**)",
+            "Bash(tar * **/.ssh/**)",
+            "Bash(tar * **/.aws/**)"
         ]
     },
+    "sandbox": {
+        "enabled": true,
+        "filesystem": {
+            "denyRead": [
+                "~/.aws/**",
+                "~/.ssh/**",
+                "~/.gnupg/**",
+                "~/.config/gcloud/**"
+            ]
+        }
+    },
+    "cleanupPeriodDays": 7,
     "includeCoAuthoredBy": false,
     "statusLine": {
         "type": "command",

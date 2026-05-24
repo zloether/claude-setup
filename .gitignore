@@ -1,1 +1,4 @@
 .claude/settings.local.json
+.claude/settings.json.backup.*
+.claude/CLAUDE.md.backup.*
+.claude/statusline-command.sh.backup.*

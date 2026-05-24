@@ -4,7 +4,9 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 SRC_DIR="$REPO_DIR/claude"
 CLAUDE_DIR="$HOME/.claude"
-SETTINGS_DEST="$CLAUDE_DIR/settings.json"
+
+# Files this script manages — anything else in ~/.claude/ is left untouched
+MANAGED_FILES=(settings.json CLAUDE.md statusline-command.sh)
 
 echo "==> Claude Code Setup"
 echo ""
@@ -29,17 +31,26 @@ fi
 # Ensure ~/.claude exists
 mkdir -p "$CLAUDE_DIR"
 
-# Back up existing settings.json
-if [ -f "$SETTINGS_DEST" ]; then
-  BACKUP="${SETTINGS_DEST}.backup.$(date +%Y%m%d_%H%M%S)"
-  cp "$SETTINGS_DEST" "$BACKUP"
-  echo "  Backed up existing settings → ${BACKUP}"
-fi
+# Back up each managed file individually before overwriting
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+for f in "${MANAGED_FILES[@]}"; do
+  dest="$CLAUDE_DIR/$f"
+  if [ -f "$dest" ]; then
+    cp "$dest" "${dest}.backup.${TIMESTAMP}"
+    echo "  Backed up ${dest} → ${dest}.backup.${TIMESTAMP}"
+  fi
+done
 
-# Copy everything from claude/ into ~/.claude/
-cp -r "$SRC_DIR/." "$CLAUDE_DIR/"
+# Copy only the managed files — leave the rest of ~/.claude/ untouched
+for f in "${MANAGED_FILES[@]}"; do
+  src="$SRC_DIR/$f"
+  if [ -f "$src" ]; then
+    cp "$src" "$CLAUDE_DIR/$f"
+    echo "  Copied $f → ${CLAUDE_DIR}/$f"
+  fi
+done
+
 chmod +x "$CLAUDE_DIR/statusline-command.sh"
-echo "  Applied claude/ → ${CLAUDE_DIR}/"
 
 echo ""
 echo "==> Done. Review ~/.claude/settings.json and adjust for your workflow."

@@ -7,7 +7,7 @@ used_pct=$(echo "$input" | jq -r 'if .context_window.used_percentage != null the
 usage_5h=$(echo "$input" | jq -r 'if (.rate_limits.five_hour.used_percentage // null) != null then "5h: " + (.rate_limits.five_hour.used_percentage | round | tostring) + "%" else "" end')
 usage_7d=$(echo "$input" | jq -r 'if (.rate_limits.seven_day.used_percentage // null) != null then "7d: " + (.rate_limits.seven_day.used_percentage | round | tostring) + "%" else "" end')
 
-branch=$(GIT_OPTIONAL_LOCKS=0 git -C "$cwd" rev-parse --abbrev-ref HEAD 2>/dev/null)
+branch=$(cd "$cwd" 2>/dev/null && GIT_OPTIONAL_LOCKS=0 git rev-parse --abbrev-ref HEAD 2>/dev/null)
 
 cwd_display="${cwd/#$HOME/~}"
 [ -n "$branch" ] && dir_display="$cwd_display ($branch)" || dir_display="$cwd_display"

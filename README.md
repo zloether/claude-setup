@@ -119,6 +119,40 @@ You can scope these more tightly if needed — for example, restricting writes t
 
 Scoped project-level `allow` rules (e.g. `Read(./**)`) override the generic user-level `deny` for `Read`, because they are more specific. However, the explicitly-patterned deny rules for sensitive files (`.env`, SSH keys, credentials, etc.) remain in force — no project-level allow can override those unless it exactly matches one of those specific patterns.
 
+
+---
+
+## Optional: system-level lockdown (`managed-settings.json`)
+
+For stronger protection, you can deploy a `managed-settings.json` at the system level. Settings here are **priority 1 — they cannot be overridden by project or user settings**, including by a malicious `.claude/settings.json` in a cloned repo.
+
+This repo includes a sample at [`managed-settings.json`](managed-settings.json). Copy it to the platform path with admin privileges:
+
+| Platform | Path |
+|----------|------|
+| macOS | `/Library/Application Support/ClaudeCode/managed-settings.json` |
+| Linux / WSL | `/etc/claude-code/managed-settings.json` |
+| Windows | `C:\Program Files\ClaudeCode\managed-settings.json` |
+
+**What the sample locks down:**
+
+| Setting | Effect |
+|---------|--------|
+| `disableAllHooks: true` | Disables all hooks and the statusLine command — unoverridable by any project |
+| `disableSkillShellExecution: true` | Blocks shell execution inside skills and slash commands |
+| `disableBypassPermissionsMode: "disable"` | Prevents `--dangerously-skip-permissions` from ever running |
+| `sandbox.network.allowedDomains: []` | Blocks all outbound network from sandboxed shell commands |
+| `sandbox.filesystem.denyRead` | OS-level block on credential paths (`.aws`, `.ssh`, `.gnupg`, `gcloud`) |
+| `permissions.deny` | Mirrors the deny rules from `settings.json`, enforced at managed priority |
+| `cleanupPeriodDays: 7` | Session transcripts deleted after 7 days |
+
+**Trade-offs to understand before deploying:**
+
+- `disableAllHooks: true` kills the statusLine. You lose the context %, rate limit, and branch display. This is intentional — it's the only way to make hook disabling unoverridable.
+- `sandbox.network.allowedDomains: []` blocks **all** outbound from shell commands, including `git push`, `npm install`, `pip install`. Add domains you need, e.g. `"github.com"`, `"*.npmjs.org"`, `"pypi.org"`.
+- These settings apply machine-wide to all users. Don't deploy on a shared machine without understanding the impact.
+
+`setup.sh` does **not** install this file — it requires a manual copy with admin privileges by design.
 ---
 
 ## Threat model and limitations

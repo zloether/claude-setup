@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+
+  "disableAllHooks": true,
+  "disableSkillShellExecution": true,
+  "disableBypassPermissionsMode": "disable",
+  "cleanupPeriodDays": 7,
+
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "denyRead": [
+        "~/.aws/**",
+        "~/.ssh/**",
+        "~/.gnupg/**",
+        "~/.config/gcloud/**"
+      ]
+    },
+    "network": {
+      "allowedDomains": []
+    }
+  },
+
+  "permissions": {
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(su *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(sftp *)",
+      "Bash(nc *)",
+      "Bash(ncat *)",
+      "Bash(bash -c *)",
+      "Bash(sh -c *)",
+      "Bash(zsh -c *)",
+      "Bash(fish -c *)",
+      "Bash(eval *)",
+      "Bash(env *)",
+      "Bash(xargs *)",
+      "Bash(python -c *)",
+      "Bash(python3 -c *)",
+      "Bash(node -e *)",
+      "Bash(perl -e *)",
+      "Bash(ruby -e *)",
+      "Bash(rm -r *)",
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(rm --recursive *)",
+      "Bash(mkfs *)",
+      "Bash(dd *)",
+      "Bash(chown *)",
+      "Bash(crontab *)",
+      "Bash(at *)",
+      "Bash(launchctl *)",
+      "Bash(systemctl *)",
+      "Bash(cat **/.env*)",
+      "Bash(cat **/.ssh/**)",
+      "Bash(cat **/.aws/**)",
+      "Bash(cat **/id_rsa*)",
+      "Bash(cat **/id_ed25519*)",
+      "Bash(cat **/.gnupg/**)",
+      "Bash(grep * **/.env*)",
+      "Bash(grep * **/.ssh/**)",
+      "Bash(grep * **/.aws/**)",
+      "Bash(find * **/.ssh/**)",
+      "Bash(find * **/.aws/**)",
+      "Bash(tar * **/.ssh/**)",
+      "Bash(tar * **/.aws/**)",
+      "Write(**/.git/hooks/**)",
+      "Write(**/.git/config)",
+      "Write(**/.mcp.json)"
+    ]
+  }
+}

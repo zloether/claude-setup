@@ -17,6 +17,7 @@ This repo is a bootstrap helper for configuring a personal Claude Code instance.
 | `.claude/settings.json` | Project-level settings for this repo — re-enables Read/Edit/Write so Claude can work in this directory |
 | `CLAUDE.md` | Minimal project-level instructions pointing here |
 | `AGENTS.md` | This file — instructions for AI agents assisting with setup |
+| `managed-settings.json` | Sample system-level settings for maximum lockdown (see README) |
 
 ---
 
@@ -92,6 +93,8 @@ The `settings.json` in this repo is a reasonable starting point with:
 Note: `python *.py` / `python3 *.py` are in `allow`, while the broader `python *` / `python3 *` are in `ask`. This means plain script execution is auto-approved but arbitrary python invocations (with flags, module args, etc.) prompt first.
 
 Before running `./setup.sh`, review `settings.json` and adjust for the user's environment. See `claude-settings-reference.md` for a full explanation of every option.
+
+If the user wants stronger protection — particularly making hook disabling unoverridable — point them to `managed-settings.json` in this repo. It must be copied manually to the system path with admin privileges (`/Library/Application Support/ClaudeCode/managed-settings.json` on macOS). It cannot be applied by `setup.sh`. Key trade-off: `disableAllHooks: true` in managed settings also disables the statusLine, and `sandbox.network.allowedDomains: []` blocks all outbound shell network until the user adds domains they need.
 
 ---
 

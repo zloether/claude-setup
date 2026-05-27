@@ -174,6 +174,16 @@ OS-level isolation for Bash commands — applies only to shell commands, not to 
       "~/.ssh/**",
       "~/.gnupg/**",
       "~/.config/gcloud/**",
+      "~/.config/op/**",
+      "~/.config/doctl/**",
+      "~/.config/fly/**",
+      "~/.config/stripe/**",
+      "~/.config/heroku/**",
+      "~/.config/pypoetry/**",
+      "~/.config/configstore/**",
+      "~/.config/helm/**",
+      "~/.config/rclone/**",
+      "~/.config/restic/**",
       "~/Library/**"
     ]
   },
@@ -188,6 +198,8 @@ OS-level isolation for Bash commands — applies only to shell commands, not to 
 **`allowedDomains: []`** blocks all outbound network from sandboxed shell commands (including `git push`, `npm install`). Add domains you need, e.g. `"github.com"`, `"*.npmjs.org"`.
 
 The sandbox automatically merges `Read`/`Edit` deny rules from `permissions` into its boundary — you don't need to duplicate every `Read` deny in `sandbox.filesystem.denyRead`. The sandbox-specific paths are for OS-level enforcement of anything not already covered by permission rules.
+
+**Two-tier pattern for CLI tools that authenticate as subprocesses:** some CLIs (e.g. `gh`, `netlify`, `vercel`) need to read their own credential files at runtime. Blocking them in `sandbox.denyRead` breaks authentication entirely. The solution is to add them to `permissions.deny` only — this prevents Claude's native Read tool from reading the token files directly, while leaving the subprocess free to authenticate normally. To apply this pattern to a new CLI: add `"Read(~/.config/<tool>/**)"` (or `"Read(~/.<tool>/**)"`) to `permissions.deny`, and do **not** add it to `sandbox.denyRead`.
 
 **Platform requirements:**
 - macOS: works out of the box (uses Seatbelt)

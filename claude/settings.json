@@ -61,6 +61,8 @@
             "Read(**/Documents/**)",
             "Read(**/Downloads/**)",
             "Read(~/Library/**)",
+            "Read(~/.gitconfig)",
+            "Read(~/.config/git/**)",
             "Read(~/.config/gh/**)",
             "Read(~/.config/op/**)",
             "Read(~/.config/doctl/**)",

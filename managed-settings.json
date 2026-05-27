@@ -54,6 +54,8 @@
   "permissions": {
     "deny": [
       "Read(~/Library/**)",
+      "Read(~/.gitconfig)",
+      "Read(~/.config/git/**)",
       "Read(~/.config/gh/**)",
       "Read(~/.config/gcloud/**)",
       "Read(~/.config/op/**)",

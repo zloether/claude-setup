@@ -1,8 +1,13 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
 
-  "disableAllHooks": true,
+  "allowManagedHooksOnly": true,
   "disableSkillShellExecution": true,
+  "statusLine": {
+    "type": "command",
+    "command": "/usr/local/bin/claude-statusline",
+    "refreshIntervalMs": 5000
+  },
   "disableBypassPermissionsMode": "disable",
   "cleanupPeriodDays": 7,
 
@@ -13,7 +18,23 @@
         "~/.aws/**",
         "~/.ssh/**",
         "~/.gnupg/**",
-        "~/.config/gcloud/**"
+        "~/.config/**",
+        "~/Library/**",
+        "~/.password-store/**",
+        "~/.kube/**",
+        "~/.docker/**",
+        "~/.npmrc",
+        "~/.netrc",
+        "~/.mozilla/**",
+        "~/.netlify/**",
+        "~/.vercel/**",
+        "~/.zsh_history",
+        "~/.bash_history",
+        "~/.python_history",
+        "~/.node_repl_history",
+        "~/.psql_history",
+        "~/.mysql_history",
+        "~/.lesshst"
       ]
     },
     "network": {
@@ -23,6 +44,27 @@
 
   "permissions": {
     "deny": [
+      "Read(~/Library/**)",
+      "Read(~/.config/**)",
+      "Read(~/.password-store/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.ssh/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.kube/**)",
+      "Read(~/.docker/**)",
+      "Read(~/.npmrc)",
+      "Read(~/.netrc)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*.key)",
+      "Read(**/*.pem)",
+      "Read(~/.zsh_history)",
+      "Read(~/.bash_history)",
+      "Bash(git diff --no-index *)",
+      "Bash(printenv *)",
+      "Bash(osascript *)",
+      "Bash(security *)",
+      "Bash(open *)",
       "Bash(sudo *)",
       "Bash(su *)",
       "Bash(curl *)",

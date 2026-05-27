@@ -13,8 +13,9 @@ This repo is a bootstrap helper for configuring a personal Claude Code instance.
 | `claude/settings.json` | Opinionated user-level Claude Code settings |
 | `claude/statusline-command.sh` | Status line script: cwd, git branch, model, context %, rate limit usage |
 | `claude-settings-reference.md` | Comprehensive reference for every `settings.json` key with examples |
+| `macos-library-deny-paths.md` | Categorized list of sensitive `~/Library/` paths; reference for macOS app developers who need to narrow the blanket `Read(~/Library/**)` deny |
 | `setup.sh` | Copies `claude/` to `~/.claude/`, validates the environment; run first after cloning |
-| `.claude/settings.json` | Project-level settings for this repo — re-enables Read/Edit/Write so Claude can work in this directory |
+| `.claude/settings.json` | Project-level settings for this repo — allows Read/Edit/Write within this directory |
 | `CLAUDE.md` | Minimal project-level instructions pointing here |
 | `AGENTS.md` | This file — instructions for AI agents assisting with setup |
 | `managed-settings.json` | Sample system-level settings for maximum lockdown (see README) |
@@ -47,10 +48,11 @@ brew install --cask claude-code
 ```
 
 This will:
-- Back up any existing `~/.claude/settings.json`
-- Copy `settings.json` from this repo to `~/.claude/settings.json`
-- Install `statusline-command.sh` to `~/.claude/statusline-command.sh`
-- Verify the installation is working
+- Back up and replace `~/.claude/settings.json` and `CLAUDE.md` (no sudo needed)
+- Deploy `managed-settings.json` to the system path (requires sudo — this is expected)
+- Install `statusline-command.sh` to `/usr/local/bin/claude-statusline` (root-owned, requires sudo)
+
+The sudo step is intentional: managed settings and the statusline script must be root-owned so they cannot be modified by prompt injection or a malicious repo.
 
 ### Step 3 — Authenticate
 
@@ -73,28 +75,38 @@ If you are an AI agent assisting someone with setup, follow this checklist:
    - `permissions.allow` / `permissions.deny`: adjust to match their workflow
    - `includeCoAuthoredBy`: whether to add Claude attribution to commits
    - `autoUpdatesChannel`: `"stable"` (recommended) or `"latest"`
-4. **Verify**: after applying, run `claude --version` and confirm the user can open a session.
-5. **Set up project-level settings**: remind the user that each project needs a `.claude/settings.json` to re-enable Read/Edit/Write (see README for the template). Always use scoped patterns like `"Read(./**)"` instead of bare `"Read"` — bare patterns grant global read access across the filesystem. This repo's own `.claude/settings.json` is an example of the scoped form.
-6. **Warn about untrusted repos**: running Claude Code inside a repo the user doesn't control is risky. A repo's `.claude/settings.json` can define hooks that execute shell commands automatically (no permission prompt), add `allow` rules that re-enable denied tools, and override user-level settings. Hooks are the most dangerous vector — they run silently at every tool use and are not blocked by `Bash` deny rules. Instruct the user to inspect `.claude/settings.json` (especially any `hooks` key) before opening Claude in an unfamiliar repo. Prompt injection from any file Claude reads is also a real concern.
+4. **Verify**: after applying, run `claude --version` and confirm the user can open a session. Then open a session and run `/status` to confirm that `managed-settings.json` is listed as an active settings source. If it is missing, hook isolation and sandbox restrictions for `~/Library` and `~/.config` are not in effect — follow the manual steps printed by `setup.sh` to deploy it.
+5. **Set up project-level settings**: remind the user that each project needs a `.claude/settings.json` to allow Read/Edit/Write within the project directory (see README for the template). Without it, Claude cannot read or write project files at all — `dontAsk` mode denies everything not explicitly allowed. Always use scoped patterns like `"Read(./**)"` instead of bare `"Read"` — bare patterns allow reads across the entire filesystem. This repo's own `.claude/settings.json` is an example of the scoped form.
+6. **Warn about untrusted repos**: running Claude Code inside a repo the user doesn't control is risky. A repo's `.claude/settings.json` can define hooks that execute shell commands automatically (no permission prompt), add `allow` rules and expand `additionalDirectories` to broaden Claude's read scope, and override scalar settings. User-level `deny` rules still hold across scopes (deny beats allow at every level), so the expanded deny list in this repo protects high-value targets (browser data, mail, Keychain, password managers, shell history) even in malicious projects. **Hooks are the most dangerous vector** — they run silently at every tool use, are not blocked by `Bash` deny rules, and can only be reliably disabled via `managed-settings.json` (this repo uses `allowManagedHooksOnly: true`). Instruct the user to inspect `.claude/settings.json` (especially any `hooks` key, `additionalDirectories`, and broad `allow` rules) before opening Claude in an unfamiliar repo. Prompt injection from any file Claude reads is also a real concern.
 
 ---
 
 ## Customizing `settings.json` Before Applying
 
 The `settings.json` in this repo is a reasonable starting point with:
-- Strict deny rules for sensitive files and dangerous commands
-- `ask` rules for higher-risk actions (git push, npm install, pip install)
-- `allow` rules for common safe operations (git add/commit, run `python *.py` scripts)
-- Sandbox enabled with OS-level `denyRead` for credential paths (`~/.aws`, `~/.ssh`, `~/.gnupg`, `~/.config/gcloud`)
+- `defaultMode: "dontAsk"` — Claude silently denies any tool not in the allow list; memory (`~/.claude/projects/*/memory/`) read and plans (`~/.claude/plans/`) read/edit/write paths are pre-allowed; strict deny rules for sensitive files (credentials, **blanket `~/Library/**` block** covering Keychain/browsers/Mail/iMessage/password managers/app data, Linux browser/communications equivalents, password stores, shell histories, CLI tool credentials) and dangerous shell commands. Per the official docs, `Read` deny rules also block the recognized Bash file commands `cat`, `head`, `tail`, and `sed` — no need to duplicate as `Bash(cat …)` rules. **macOS app developers** who need to read their own app's data under `~/Library/Application Support/<MyApp>/` must narrow the user-level (and possibly managed) deny — `deny` beats `allow` across scopes, so project allows cannot punch through.
+- `ask` rules for higher-risk actions (git push, npm install, pip install, python execution, web fetch/search, chmod, rm, memory writes). **In `dontAsk` mode, `ask` entries are silently denied — `ask` functions as a second deny list.** To approve a gated action, cycle modes with `Shift+Tab` to a prompting mode (`default` or `acceptEdits`) or relaunch with `claude --permission-mode default`. The lockdown holds until you explicitly opt in for the session.
+- `allow` rules for common safe operations (read-only git, git add/commit, plans/memory reads)
+- Sandbox enabled with OS-level `denyRead` for credential paths (`~/.aws`, `~/.ssh`, `~/.gnupg`, `~/.config/gcloud`) — note the sandbox applies to shell (Bash) commands only, not to Claude's native Read/Edit/Write tools, which are governed by permission rules
 - `cleanupPeriodDays: 7` — transcripts deleted after 7 days
 - `bypassPermissions` mode disabled for safety
 - Dark theme, stable update channel, co-author attribution disabled
 
-Note: `python *.py` / `python3 *.py` are in `allow`, while the broader `python *` / `python3 *` are in `ask`. This means plain script execution is auto-approved but arbitrary python invocations (with flags, module args, etc.) prompt first.
+Note on Python: both `python *.py` / `python3 *.py` and the broader `python *` / `python3 *` are in `ask`. This means *all* Python execution is gated by default — even running a basic script requires switching out of `dontAsk` for the session. Projects that routinely run Python can opt back in via their own `.claude/settings.json` setting `"defaultMode": "default"` (project scalars override user scalars). A project-level `allow` rule alone cannot override a user-level `ask` rule.
 
-Before running `./setup.sh`, review `settings.json` and adjust for the user's environment. See `claude-settings-reference.md` for a full explanation of every option.
+Before running `./setup.sh`, review `settings.json` and adjust for the user's environment. See `claude-settings-reference.md` for the settings used in this repo. For authoritative behavior details, fetch from the official docs rather than relying on the local reference file alone.
 
-If the user wants stronger protection — particularly making hook disabling unoverridable — point them to `managed-settings.json` in this repo. It must be copied manually to the system path with admin privileges (`/Library/Application Support/ClaudeCode/managed-settings.json` on macOS). It cannot be applied by `setup.sh`. Key trade-off: `disableAllHooks: true` in managed settings also disables the statusLine, and `sandbox.network.allowedDomains: []` blocks all outbound shell network until the user adds domains they need.
+`setup.sh` deploys `managed-settings.json` by default (the sudo step). It uses `allowManagedHooksOnly: true` to block project and user hooks while keeping the statusline (which is defined in managed settings and points to the root-owned `/usr/local/bin/claude-statusline`). Key trade-off: `sandbox.network.allowedDomains: []` blocks all outbound shell network until the user adds domains they need (e.g. `"github.com"`, `"*.npmjs.org"`).
+
+---
+
+## Official Documentation
+
+When verifying behavior, fetch from these URLs rather than relying solely on the local reference file:
+
+- Settings: https://docs.anthropic.com/en/docs/claude-code/settings
+- Permissions: https://docs.anthropic.com/en/docs/claude-code/security/permissions
+- Hooks: https://docs.anthropic.com/en/docs/claude-code/hooks
 
 ---
 

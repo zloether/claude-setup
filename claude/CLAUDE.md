@@ -1,1 +1,2 @@
 - Never use `git -C <path>` to specify a working directory. Git already operates on the current working tree; use plain `git` commands directly.
+- Before writing a memory, output the exact content you intend to write as a quoted block so the user can review it before the write is attempted.

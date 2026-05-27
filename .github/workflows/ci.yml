@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON
+        run: |
+          for f in claude/settings.json managed-settings.json .claude/settings.json; do
+            jq . "$f" > /dev/null
+            echo "  OK  $f"
+          done
+
+      - name: Lint shell scripts
+        run: |
+          shellcheck setup.sh
+          shellcheck claude/statusline-command.sh
+
+      - name: Check managed sandbox denyRead covers user sandbox denyRead
+        run: |
+          user=$(jq -r '.sandbox.filesystem.denyRead[]' claude/settings.json)
+          managed=$(jq -r '.sandbox.filesystem.denyRead[]' managed-settings.json)
+          fail=0
+          while IFS= read -r path; do
+            [ -z "$path" ] && continue
+            if ! printf '%s\n' "$managed" | grep -qxF "$path"; then
+              echo "missing from managed sandbox denyRead: $path"
+              fail=1
+            fi
+          done <<< "$user"
+          if [ "$fail" -ne 0 ]; then
+            echo ""
+            echo "managed-settings.json sandbox.denyRead must be a superset of claude/settings.json sandbox.denyRead"
+            exit 1
+          fi
+          echo "managed sandbox denyRead covers all user sandbox denyRead paths"

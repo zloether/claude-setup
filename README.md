@@ -185,7 +185,7 @@ Key assumptions:
 
 Hooks are the sharpest edge: they execute silently, merge across settings scopes, and the only reliable way to disable them machine-wide is via a system-level `managed-settings.json` (requires admin). User-level `disableAllHooks: true` can itself be overridden by a higher-priority project setting; this repo uses `allowManagedHooksOnly: true` in managed settings instead, which blocks all non-managed hooks.
 
-**`git add` and `git commit` are in the allow list** by design, enabling Claude to stage and commit its own changes in autonomous workflows. The trade-off: prompt injection in any file Claude reads could stage and commit malicious changes silently — including modifications to `setup.sh` in this bootstrap repo, which runs with `sudo` and deploys to other machines. `git push` is in `ask` (silently denied in `dontAsk` mode), so changes stay local, but reviewing pending commits before pushing is important.
+**`git add` and `git commit` are not in the allow list by default.** They were removed to prevent prompt injection from silently committing malicious changes — particularly to `setup.sh` in this bootstrap repo, which runs with `sudo` and deploys to other machines. Projects that need autonomous commits can add them to a project-level `allow`. Because they are absent from the user-level `ask` list (not just `allow`), the project-level `allow` takes effect cleanly without being overridden.
 
 **Before opening Claude in an unfamiliar repo**, check whether `.claude/settings.json` exists and review its contents — especially any `hooks` key, any expansion of `additionalDirectories`, and any broad `allow` rules.
 

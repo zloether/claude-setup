@@ -54,9 +54,6 @@
   "permissions": {
     "deny": [
       "Read(~/Library/**)",
-      "Read(~/.gitconfig)",
-      "Read(~/.config/git/**)",
-      "Read(~/.config/gh/**)",
       "Read(~/.config/gcloud/**)",
       "Read(~/.config/op/**)",
       "Read(~/.config/doctl/**)",
@@ -81,8 +78,6 @@
       "Read(**/.env.*)",
       "Read(**/*.key)",
       "Read(**/*.pem)",
-      "Read(~/.netlify/**)",
-      "Read(~/.vercel/**)",
       "Read(~/.zsh_history)",
       "Read(~/.bash_history)",
       "Bash(git diff --no-index *)",

@@ -199,7 +199,7 @@ OS-level isolation for Bash commands — applies only to shell commands, not to 
 
 The sandbox automatically merges `Read`/`Edit` deny rules from `permissions` into its boundary — you don't need to duplicate every `Read` deny in `sandbox.filesystem.denyRead`. The sandbox-specific paths are for OS-level enforcement of anything not already covered by permission rules.
 
-**Two-tier pattern for CLI tools that authenticate as subprocesses:** some CLIs (e.g. `gh`, `netlify`, `vercel`) need to read their own credential files at runtime. Blocking them in `sandbox.denyRead` breaks authentication entirely. The solution is to add them to `permissions.deny` only — this prevents Claude's native Read tool from reading the token files directly, while leaving the subprocess free to authenticate normally. To apply this pattern to a new CLI: add `"Read(~/.config/<tool>/**)"` (or `"Read(~/.<tool>/**)"`) to `permissions.deny`, and do **not** add it to `sandbox.denyRead`.
+**There is no two-tier separation between Claude reads and subprocess reads.** The sandbox automatically merges `permissions.deny` Read rules into its OS-level enforcement — a path in `permissions.deny` also blocks subprocess reads, not just Claude's native Read tool. If a CLI tool needs to authenticate as a subprocess (e.g. `gh`, `netlify`, `vercel`), omit it from both `permissions.deny` and `sandbox.denyRead`. Adding it to `permissions.deny` alone will break the CLI.
 
 **Platform requirements:**
 - macOS: works out of the box (uses Seatbelt)

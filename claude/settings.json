@@ -25,6 +25,7 @@
             "Write(~/.claude/projects/**/memory/**)",
             "Edit(~/.claude/plans/**)",
             "Write(~/.claude/plans/**)",
+            "Bash(gh *)",
             "Bash(git remote set-url *)",
             "Bash(git remote add *)",
             "Bash(git remote remove *)",

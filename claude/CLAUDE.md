@@ -45,6 +45,7 @@ Then execute. Don't ask me to approve the plan unless there's a real fork in the
 ## Git
 
 - Never use `git -C <path>`. It can read history and file contents from repos outside the current project; use plain `git` and let it operate on the current working tree.
+- Do not run `git commit`. Instead, after staging changes, provide a ready-to-run one-liner the user can paste into their terminal, e.g.: `git commit -m "fix: correct thing"`
 
 ## Memory
 

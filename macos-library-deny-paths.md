@@ -89,13 +89,15 @@ System and app metadata that often contain sensitive material.
 
 ```json
 "Read(~/Library/Containers/**)",
-"Read(~/Library/Group Containers/**)",
+"Read(~/Library/Group Containers/group.com.apple.notes/**)",
 "Read(~/Library/Application Support/com.apple.TCC/**)",
 "Read(~/Library/Logs/**)",
 "Read(~/Library/Saved Application State/**)"
 ```
 
-> `~/Library/Containers/**` and `~/Library/Group Containers/**` are broad — many sandboxed apps store data under these roots. If you're developing a sandboxed macOS app, your own app's data lives at `~/Library/Containers/<your.bundle.id>/` and you'll need a more specific deny or scoped allow.
+> `~/Library/Containers/**` is broad — many sandboxed apps store data under this root. If you're developing a sandboxed macOS app, your data lives at `~/Library/Containers/<your.bundle.id>/` and you'll need a more specific deny or scoped allow.
+>
+> `~/Library/Group Containers/**` is intentionally **not** used as a blanket block. The 1Password SSH agent socket lives at `~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock`; a blanket deny on `Group Containers` prevents `git commit` signing from reaching it. Block specific Group Containers paths you care about (e.g. `group.com.apple.notes`) rather than the whole subtree.
 
 ---
 
@@ -140,7 +142,7 @@ Paste into the `permissions.deny` array in `~/.claude/settings.json`:
 "Read(~/Library/CloudStorage/**)",
 "Read(~/Library/Mobile Documents/**)",
 "Read(~/Library/Containers/**)",
-"Read(~/Library/Group Containers/**)",
+"Read(~/Library/Group Containers/group.com.apple.notes/**)",
 "Read(~/Library/Application Support/com.apple.TCC/**)",
 "Read(~/Library/Logs/**)",
 "Read(~/Library/Saved Application State/**)"
@@ -187,7 +189,7 @@ Paste into `sandbox.filesystem.denyRead` in `managed-settings.json` for OS-level
 "~/Library/CloudStorage/**",
 "~/Library/Mobile Documents/**",
 "~/Library/Containers/**",
-"~/Library/Group Containers/**",
+"~/Library/Group Containers/group.com.apple.notes/**",
 "~/Library/Application Support/com.apple.TCC/**",
 "~/Library/Logs/**",
 "~/Library/Saved Application State/**"

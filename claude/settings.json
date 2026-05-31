@@ -7,6 +7,8 @@
         "allow": [
             "Read(~/.claude/projects/**/memory/**)",
             "Read(~/.claude/plans/**)",
+            "Read(**/site-packages/certifi/cacert.pem)",
+            "Read(**/site-packages/pip/_vendor/certifi/cacert.pem)",
             "Bash(git status)",
             "Bash(git diff *)",
             "Bash(git log *)",
@@ -23,6 +25,7 @@
             "Write(~/.claude/projects/**/memory/**)",
             "Edit(~/.claude/plans/**)",
             "Write(~/.claude/plans/**)",
+            "Bash(gh *)",
             "Bash(git remote set-url *)",
             "Bash(git remote add *)",
             "Bash(git remote remove *)",

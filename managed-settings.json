@@ -47,7 +47,11 @@
       ]
     },
     "network": {
-      "allowedDomains": []
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "uploads.github.com"
+      ]
     }
   },
 

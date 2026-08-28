@@ -104,22 +104,22 @@ Create `.claude/settings.json` at the root of each project:
   "permissions": {
     "allow": [
       "Read(./**)",
-      "Edit(./**)",
-      "Write(./**)"
+      "Edit(./**)"
     ]
   }
 }
 ```
 
-You can scope these more tightly if needed — for example, restricting writes to a specific directory:
+Claude Code only checks file permissions against `Read(path)` and `Edit(path)` rules — an `Edit(./**)` rule also covers the Write tool, so there's no separate `Write(./**)` rule to add.
+
+You can scope these more tightly if needed — for example, restricting edits (including new-file writes) to a specific directory:
 
 ```json
 {
   "permissions": {
     "allow": [
       "Read(./**)",
-      "Edit(./**)",
-      "Write(src/**)"
+      "Edit(src/**)"
     ]
   }
 }
@@ -193,4 +193,4 @@ Hooks are the sharpest edge: they execute silently, merge across settings scopes
 
 For maximum hardening, `managed-settings.json` supports a managed-only setting `allowManagedPermissionRulesOnly: true`, which causes user- and project-level `allow`/`ask`/`deny` rules to be **completely ignored** — only managed permission rules apply. This closes the project-allow-expansion vector entirely.
 
-The trade-off is significant: this repo's design relies on per-project `.claude/settings.json` adding `Read(./**)`, `Edit(./**)`, `Write(./**)` allow rules so Claude can access files in each project under `dontAsk` mode. With `allowManagedPermissionRulesOnly: true`, those project allows are ignored, and you'd need to enumerate all allow rules in managed settings instead. **Not enabled by default** in this repo. Enable it only if you're prepared to manage all permission rules centrally.
+The trade-off is significant: this repo's design relies on per-project `.claude/settings.json` adding `Read(./**)`, `Edit(./**)` allow rules so Claude can access files in each project under `dontAsk` mode. With `allowManagedPermissionRulesOnly: true`, those project allows are ignored, and you'd need to enumerate all allow rules in managed settings instead. **Not enabled by default** in this repo. Enable it only if you're prepared to manage all permission rules centrally.

@@ -98,7 +98,6 @@ Grants Claude permission to use a tool without asking.
   "Read(~/.claude/projects/**/memory/**)",
   "Read(~/.claude/plans/**)",
   "Edit(~/.claude/plans/**)",
-  "Write(~/.claude/plans/**)",
   "Bash(git status)",
   "Bash(git diff *)",
   "Bash(git add *)",
@@ -297,7 +296,7 @@ Disables inline shell execution (`` !`...` `` and `` ```! `` blocks) in skills a
 
 Causes user-level and project-level `allow`/`ask`/`deny` rules to be completely ignored — only permission rules defined in `managed-settings.json` apply. This closes the project-allow-expansion vector entirely.
 
-**Not used by default in this repo.** This repo's design relies on per-project `.claude/settings.json` adding `Read(./**)` / `Edit(./**)` / `Write(./**)` allow rules so Claude can access files under `dontAsk` mode. Enabling `allowManagedPermissionRulesOnly` would ignore those project allows, requiring all allow rules to be enumerated in managed settings instead.
+**Not used by default in this repo.** This repo's design relies on per-project `.claude/settings.json` adding `Read(./**)` / `Edit(./**)` allow rules so Claude can access files under `dontAsk` mode. Enabling `allowManagedPermissionRulesOnly` would ignore those project allows, requiring all allow rules to be enumerated in managed settings instead.
 
 Enable only if you're prepared to manage all permission rules centrally.
 

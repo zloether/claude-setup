@@ -134,9 +134,9 @@
       "Bash(find * **/.aws/**)",
       "Bash(tar * **/.ssh/**)",
       "Bash(tar * **/.aws/**)",
-      "Write(**/.git/hooks/**)",
-      "Write(**/.git/config)",
-      "Write(**/.mcp.json)"
+      "Edit(**/.git/hooks/**)",
+      "Edit(**/.git/config)",
+      "Edit(**/.mcp.json)"
     ]
   }
 }
